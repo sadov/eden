@@ -23,7 +23,7 @@ var qemuRunCmd = &cobra.Command{
 	Long:  `Run qemu-system with eve.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		qemuCommand := ""
-		qemuOptions := "-display none -serial mon:stdio -nodefaults -no-user-config "
+		qemuOptions := "-machine q35,accel=kvm -device intel-iommu -display none -serial mon:stdio -nodefaults -no-user-config "
 		if qemuSMBIOSSerial != "" {
 			qemuOptions += fmt.Sprintf("-smbios type=1,serial=%s ", qemuSMBIOSSerial)
 		}

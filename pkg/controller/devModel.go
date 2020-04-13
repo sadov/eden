@@ -91,6 +91,12 @@ func (cloud *CloudCtx) GetDevModel(devModelType DevModelType) (*DevModel, error)
 					UsagePolicy: &config.PhyIOUsagePolicy{
 						FreeUplink: true,
 					},
+				}, {
+					Ptype:        config.PhyIoType_PhyIoNetEth,
+					Phylabel:     "eth2",
+					Logicallabel: "eth2",
+					Assigngrp:    "eth2",
+					Phyaddrs:     map[string]string{"Ifname": "eth2", "pcilong": "0000:02:00.0"},
 				},
 				},
 				[]*config.NetworkConfig{

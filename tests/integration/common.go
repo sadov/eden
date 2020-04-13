@@ -42,6 +42,7 @@ type appInstLocal struct {
 	eveIP              string
 	accessPortExternal string
 	accessPortInternal string
+	adapterToPass      string
 }
 
 var eServerDataStoreID = "eab8761b-5f89-4e0b-b757-4b87a9fa93ec"
@@ -99,6 +100,7 @@ var (
 		"127.0.0.1",
 		"8027",
 		"80",
+		"eth2",
 	}
 	appInstanceLocalContainer = &appInstLocal{eServerDataStoreID,
 
@@ -114,6 +116,7 @@ var (
 		"127.0.0.1",
 		"8028",
 		"80",
+		"",
 	}
 )
 
@@ -288,6 +291,13 @@ func prepareApplicationLocal(ctx controller.Cloud, appDefinition *appInstLocal, 
 		Drvtype:  config.DriveType_HDD,
 		Target:   config.Target_Disk,
 	}
+	var adapters []*config.Adapter
+	if appDefinition.adapterToPass != "" {
+		adapters = append(adapters, &config.Adapter{
+			Type: config.PhyIoType_PhyIoNetEth,
+			Name: "eth2",
+		})
+	}
 	err = ctx.AddApplicationInstanceConfig(&config.AppInstanceConfig{
 		Uuidandversion: &config.UUIDandVersion{
 			Uuid:    appDefinition.appID,
@@ -317,7 +327,7 @@ func prepareApplicationLocal(ctx controller.Cloud, appDefinition *appInstLocal, 
 		Drives:        []*config.Drive{drive},
 		Activate:      true,
 		Interfaces:    networkAdapters,
-		Adapters:      nil,
+		Adapters:      adapters,
 		Restart:       nil,
 		Purge:         nil,
 		UserData:      base64.StdEncoding.EncodeToString([]byte(userData)),

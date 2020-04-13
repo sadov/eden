@@ -64,7 +64,7 @@ var qemuConfCmd = &cobra.Command{
 			}
 		}
 		//generate netdevs with unused subnets
-		nets, err := utils.GetSubnetsNotUsed(2)
+		nets, err := utils.GetSubnetsNotUsed(3)
 		if err != nil {
 			log.Fatal(err)
 		}
