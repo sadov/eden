@@ -39,6 +39,12 @@ type ConfigVars struct {
 	EdenProg          string
 	TestProg          string
 	TestScenario      string
+
+	ZedControl         bool //is zedcontrol enable
+	ZedControlLogin    string
+	ZedControlPassword string
+	ZedControlAddress  string
+	ZedControlDist     string
 }
 
 //InitVars loads vars from viper
@@ -75,6 +81,12 @@ func InitVars() (*ConfigVars, error) {
 			EdenProg:          viper.GetString("eden.eden-bin"),
 			TestProg:          viper.GetString("eden.test-bin"),
 			TestScenario:      viper.GetString("eden.test-scenario"),
+
+			ZedControl:         viper.GetBool("zedcontrol.enabled"),
+			ZedControlLogin:    viper.GetString("zedcontrol.login"),
+			ZedControlPassword: viper.GetString("zedcontrol.password"),
+			ZedControlAddress:  viper.GetString("zedcontrol.address"),
+			ZedControlDist:     ResolveAbsPath(viper.GetString("zedcontrol.dist")),
 		}
 		return vars, nil
 	}
@@ -131,6 +143,17 @@ adam:
         
         #prefix for directory/redis stream
         prefix: cache
+
+zedcontrol:
+    enabled: true
+    
+    address: {{ .DefaultZedControl }}
+
+    login: ""
+
+    password: ""
+
+    dist: {{ .DefaultZedControlDist }}
 
 eve:
     #devmodel
@@ -415,37 +438,43 @@ func generateConfigFileFromTemplate(filePath string, templateString string) erro
 			DefaultEveRepo       string
 
 			DefaultRedisContainerName string
+
+			DefaultZedControl     string
+			DefaultZedControlDist string
 		}{
-			DefaultAdamDist:      defaults.DefaultAdamDist,
-			DefaultAdamPort:      defaults.DefaultAdamPort,
-			DefaultAdamTag:       defaults.DefaultAdamTag,
-			DefaultImageDist:     defaults.DefaultImageDist,
-			ImageDir:             filepath.Join(currentPath, defaults.DefaultImageDist),
-			Root:                 filepath.Join(currentPath, defaults.DefaultDist),
-			IP:                   ip,
-			EVEIP:                eveIP,
-			UUID:                 id.String(),
-			Arch:                 runtime.GOARCH,
-			OS:                   runtime.GOOS,
-			EdenDir:              edenDir,
-			DefaultEVETag:        defaults.DefaultEVETag,
-			DefaultDomain:        defaults.DefaultDomain,
-			DefaultRedisPort:     defaults.DefaultRedisPort,
-			DefaultRedisTag:      defaults.DefaultRedisTag,
-			DefaultEVEDist:       defaults.DefaultEVEDist,
-			DefaultEserverPort:   defaults.DefaultEserverPort,
-			DefaultEVESerial:     defaults.DefaultEVESerial,
-			DefaultRedisDist:     defaults.DefaultRedisDist,
-			DefaultCertsDist:     defaults.DefaultCertsDist,
-			DefaultBinDist:       defaults.DefaultBinDist,
-			DefaultEVEHV:         defaults.DefaultEVEHV,
-			DefaultSSHPort:       defaults.DefaultSSHPort,
-			DefaultTestScenario:  defaults.DefaultTestScenario,
-			DefaultTestProg:      defaults.DefaultTestProg,
-			DefaultSSHKey:        defaults.DefaultSSHKey,
-			DefaultEveRepo:       defaults.DefaultEveRepo,
+			DefaultAdamDist:     defaults.DefaultAdamDist,
+			DefaultAdamPort:     defaults.DefaultAdamPort,
+			DefaultAdamTag:      defaults.DefaultAdamTag,
+			DefaultImageDist:    defaults.DefaultImageDist,
+			ImageDir:            filepath.Join(currentPath, defaults.DefaultImageDist),
+			Root:                filepath.Join(currentPath, defaults.DefaultDist),
+			IP:                  ip,
+			EVEIP:               eveIP,
+			UUID:                id.String(),
+			Arch:                runtime.GOARCH,
+			OS:                  runtime.GOOS,
+			EdenDir:             edenDir,
+			DefaultEVETag:       defaults.DefaultEVETag,
+			DefaultDomain:       defaults.DefaultDomain,
+			DefaultRedisPort:    defaults.DefaultRedisPort,
+			DefaultRedisTag:     defaults.DefaultRedisTag,
+			DefaultEVEDist:      defaults.DefaultEVEDist,
+			DefaultEserverPort:  defaults.DefaultEserverPort,
+			DefaultEVESerial:    defaults.DefaultEVESerial,
+			DefaultRedisDist:    defaults.DefaultRedisDist,
+			DefaultCertsDist:    defaults.DefaultCertsDist,
+			DefaultBinDist:      defaults.DefaultBinDist,
+			DefaultEVEHV:        defaults.DefaultEVEHV,
+			DefaultSSHPort:      defaults.DefaultSSHPort,
+			DefaultTestScenario: defaults.DefaultTestScenario,
+			DefaultTestProg:     defaults.DefaultTestProg,
+			DefaultSSHKey:       defaults.DefaultSSHKey,
+			DefaultEveRepo:      defaults.DefaultEveRepo,
 
 			DefaultRedisContainerName: defaults.DefaultRedisContainerName,
+
+			DefaultZedControl:     defaults.DefaultZedControl,
+			DefaultZedControlDist: defaults.DefaultZedControlDist,
 		})
 	if err != nil {
 		return err

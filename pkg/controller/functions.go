@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/lf-edge/eden/pkg/controller/adam"
+	"github.com/lf-edge/eden/pkg/controller/zedcontrol"
 	"github.com/lf-edge/eden/pkg/utils"
 	"github.com/lf-edge/eve/api/go/config"
 	uuid "github.com/satori/go.uuid"
@@ -21,6 +22,9 @@ func CloudPrepare() (Cloud, error) {
 		return nil, fmt.Errorf("utils.InitVars: %s", err)
 	}
 	ctx := &CloudCtx{vars: vars, Controller: &adam.Ctx{}}
+	if vars.ZedControl {
+		ctx.Controller = &zedcontrol.Ctx{}
+	}
 	if err := ctx.InitWithVars(vars); err != nil {
 		return nil, fmt.Errorf("cloud.InitWithVars: %s", err)
 	}

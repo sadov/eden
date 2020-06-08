@@ -81,6 +81,9 @@ const (
 	DefaultInfoRedisPrefix       = "INFO_EVE_"
 
 	DefaultAppSubnet = "10.1.0.0/24"
+
+	DefaultZedControl     = "zedcontrol.zededa.net"
+	DefaultZedControlDist = "zedcontrol"
 )
 
 var (

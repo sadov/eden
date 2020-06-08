@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"github.com/lf-edge/eden/pkg/controller"
 	"github.com/lf-edge/eden/pkg/controller/adam"
+	"github.com/lf-edge/eden/pkg/controller/zedcontrol"
 	"github.com/lf-edge/eden/pkg/device"
+	"github.com/lf-edge/eden/pkg/utils"
 	"github.com/lf-edge/eve/api/go/config"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -32,7 +34,16 @@ func (ctx *fileChanger) getControllerAndDev() (controller.Cloud, *device.Ctx, er
 	if _, err := os.Lstat(ctx.fileConfig); os.IsNotExist(err) {
 		return nil, nil, err
 	}
-	var ctrl controller.Cloud = &controller.CloudCtx{Controller: &adam.Ctx{}}
+	vars, err := utils.InitVars()
+	if err != nil {
+		return nil, nil, fmt.Errorf("utils.InitVars: %s", err)
+	}
+	var ctrl controller.Cloud
+	if vars.ZedControl {
+		ctrl = &controller.CloudCtx{Controller: &zedcontrol.Ctx{}}
+	} else {
+		ctrl = &controller.CloudCtx{Controller: &adam.Ctx{}}
+	}
 	data, err := ioutil.ReadFile(ctx.fileConfig)
 	if err != nil {
 		return nil, nil, fmt.Errorf("file reading error: %s", err)

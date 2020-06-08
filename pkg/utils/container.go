@@ -16,6 +16,7 @@ import (
 	"github.com/lf-edge/eden/pkg/defaults"
 	log "github.com/sirupsen/logrus"
 	"io"
+	"io/ioutil"
 	"net"
 	"os"
 	"os/user"
@@ -508,4 +509,57 @@ func ComputeShaOCITar(filename string) (string, error) {
 	hashArray := sha256.Sum256(manifestB)
 	hash = hashArray[:]
 	return fmt.Sprintf("%x", hash), nil
+}
+
+//RunDockerCommand is run wrapper for docker container
+func RunDockerCommand(image string, command string, volumeMap map[string]string) (result string, err error) {
+	log.Debugf("Try to call docker run %s %s", image, command)
+	ctx := context.Background()
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		return "", err
+	}
+	if err := PullImage(image); err != nil {
+		return "", err
+	}
+	var mounts []mount.Mount
+	for target, source := range volumeMap {
+		mounts = append(mounts, mount.Mount{
+			Type:   mount.TypeBind,
+			Source: source,
+			Target: target,
+		})
+	}
+	resp, err := cli.ContainerCreate(ctx, &container.Config{
+		Image: image,
+		Cmd:   strings.Fields(command),
+		Tty:   true,
+	}, &container.HostConfig{
+		Mounts: mounts},
+		nil,
+		"")
+	if err != nil {
+		return "", err
+	}
+	if err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
+		return "", err
+	}
+	statusCh, errCh := cli.ContainerWait(ctx, resp.ID, container.WaitConditionNotRunning)
+	select {
+	case err := <-errCh:
+		if err != nil {
+			return "", err
+		}
+	case <-statusCh:
+	}
+
+	out, err := cli.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true})
+	if err != nil {
+		return "", err
+	}
+	if b, err := ioutil.ReadAll(out); err == nil {
+		return string(b), nil
+	} else {
+		return "", err
+	}
 }
