@@ -5,6 +5,7 @@ import (
 	"github.com/lf-edge/eden/pkg/defaults"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
+	"net"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -200,7 +201,7 @@ func GenerateEveCerts(commandPath string, certsDir string, domain string, ip str
 }
 
 //CopyCertsToAdamConfig function copy certs to adam config
-func CopyCertsToAdamConfig(certsDir string, domain string, ip string, port int, adamDist string, apiV1 bool) (err error) {
+func CopyCertsToAdamConfig(certsDir string, domain string, ip string, port int, adamDist string, apiV1 bool, zedControl bool) (err error) {
 	adamConfig := filepath.Join(adamDist, "run", "config")
 	adamServer := filepath.Join(adamDist, "run", "adam")
 	if _, err = os.Stat(filepath.Join(certsDir, "server.pem")); os.IsNotExist(err) {
@@ -234,9 +235,32 @@ func CopyCertsToAdamConfig(certsDir string, domain string, ip string, port int, 
 	/*if err = CopyFileNotExists(filepath.Join(certsDir, "id_rsa.pub"), filepath.Join(adamConfig, "authorized_keys")); err != nil {
 		return err
 	}*/
-	if _, err = os.Stat(filepath.Join(adamConfig, "hosts")); os.IsNotExist(err) {
-		if err = ioutil.WriteFile(filepath.Join(adamConfig, "hosts"), []byte(fmt.Sprintf("%s %s\n", ip, domain)), 0666); err != nil {
+	if zedControl {
+		addr, err := net.LookupIP(domain)
+		if err != nil {
 			return err
+		}
+		ip = addr[0].String()
+		if _, err = os.Stat(filepath.Join(adamConfig, "hosts")); os.IsNotExist(err) {
+			if err = ioutil.WriteFile(filepath.Join(adamConfig, "hosts"), []byte(fmt.Sprintf("%s %s\n", ip, domain)), 0666); err != nil {
+				return err
+			}
+		}
+		if _, err = os.Stat(filepath.Join(adamConfig, "server")); os.IsNotExist(err) {
+			if err = ioutil.WriteFile(filepath.Join(adamConfig, "server"), []byte(fmt.Sprintf("%s:%d\n", domain, 443)), 0666); err != nil {
+				return err
+			}
+		}
+	} else {
+		if _, err = os.Stat(filepath.Join(adamConfig, "hosts")); os.IsNotExist(err) {
+			if err = ioutil.WriteFile(filepath.Join(adamConfig, "hosts"), []byte(fmt.Sprintf("%s %s\n", ip, domain)), 0666); err != nil {
+				return err
+			}
+		}
+		if _, err = os.Stat(filepath.Join(adamConfig, "server")); os.IsNotExist(err) {
+			if err = ioutil.WriteFile(filepath.Join(adamConfig, "server"), []byte(fmt.Sprintf("%s:%d\n", domain, port)), 0666); err != nil {
+				return err
+			}
 		}
 	}
 	if apiV1 {
@@ -244,11 +268,6 @@ func CopyCertsToAdamConfig(certsDir string, domain string, ip string, port int, 
 			if err := TouchFile(filepath.Join(adamConfig, "Force-API-V1")); err != nil {
 				log.Fatal(err)
 			}
-		}
-	}
-	if _, err = os.Stat(filepath.Join(adamConfig, "server")); os.IsNotExist(err) {
-		if err = ioutil.WriteFile(filepath.Join(adamConfig, "server"), []byte(fmt.Sprintf("%s:%d\n", domain, port)), 0666); err != nil {
-			return err
 		}
 	}
 	return nil

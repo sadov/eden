@@ -1,6 +1,9 @@
 package utils
 
 import (
+	"bytes"
+	"crypto/tls"
+	"encoding/pem"
 	"errors"
 	"fmt"
 	log "github.com/sirupsen/logrus"
@@ -139,4 +142,26 @@ func inc(ip net.IP) {
 			break
 		}
 	}
+}
+
+//GetCertificatesPEM get cert from url
+func GetCertificatesPEM(address string) (string, error) {
+	conn, err := tls.Dial("tcp", address, &tls.Config{
+		InsecureSkipVerify: true,
+	})
+	if err != nil {
+		return "", err
+	}
+	defer conn.Close()
+	var b bytes.Buffer
+	for _, cert := range conn.ConnectionState().PeerCertificates {
+		err := pem.Encode(&b, &pem.Block{
+			Type:  "CERTIFICATE",
+			Bytes: cert.Raw,
+		})
+		if err != nil {
+			return "", err
+		}
+	}
+	return b.String(), nil
 }

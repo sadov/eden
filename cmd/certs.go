@@ -7,6 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"io/ioutil"
 	"math/big"
 	"net"
 	"os"
@@ -19,6 +20,9 @@ var (
 	certsIP     string
 	certsEVEIP  string
 	certsUUID   string
+
+	zedControl        bool
+	zedControlAddress string
 )
 
 var certsCmd = &cobra.Command{
@@ -37,6 +41,8 @@ var certsCmd = &cobra.Command{
 			certsIP = viper.GetString("adam.ip")
 			certsEVEIP = viper.GetString("adam.eve-ip")
 			certsUUID = viper.GetString("eve.uuid")
+			zedControl = viper.GetBool("zedcontrol.enabled")
+			zedControlAddress = viper.GetString("zedcontrol.address")
 		}
 		return nil
 	},
@@ -54,8 +60,14 @@ var certsCmd = &cobra.Command{
 		log.Debug("generating EVE cert and key")
 		ClientCert, ClientKey := utils.GenServerCert(rootCert, rootKey, big.NewInt(2), nil, nil, certsUUID)
 		log.Debug("saving files")
-		if err := utils.WriteToFiles(rootCert, rootKey, filepath.Join(certsDir, "root-certificate.pem"), filepath.Join(certsDir, "root-certificate.key")); err != nil {
-			log.Fatal(err)
+		if zedControl {
+			if err := ioutil.WriteFile(filepath.Join(certsDir, "root-certificate.pem"), []byte(defaults.DefaultEVERootCertificate), 0755); err != nil {
+				log.Fatalf("WriteFile %s", err)
+			}
+		} else {
+			if err := utils.WriteToFiles(rootCert, rootKey, filepath.Join(certsDir, "root-certificate.pem"), filepath.Join(certsDir, "root-certificate.key")); err != nil {
+				log.Fatal(err)
+			}
 		}
 		if err := utils.WriteToFiles(ServerCert, ServerKey, filepath.Join(certsDir, "server.pem"), filepath.Join(certsDir, "server-key.pem")); err != nil {
 			log.Fatal(err)

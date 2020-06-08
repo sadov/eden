@@ -76,6 +76,11 @@ func (zedcontrol *Ctx) Register(eveCert string, eveSerial string) error {
 		return err
 	}
 	log.Debugf("zcli edge-node create %s", res)
+	res, err = zedcontrol.callZCLI(fmt.Sprintf("zcli edge-node activate %s", "eden_test"))
+	if err != nil {
+		return err
+	}
+	log.Debugf("zcli edge-node activate %s", res)
 	return nil
 }
 
@@ -125,7 +130,8 @@ func (zedcontrol *Ctx) OnBoardList() (out []string, err error) {
 
 //DeviceList return device list
 func (zedcontrol *Ctx) DeviceList() (out []string, err error) {
-	return zedcontrol.deviceListFiltered(adminStateRegistered)
+	return nil, nil
+	//return zedcontrol.deviceListFiltered(adminStateRegistered) //TODO if return not empty, then cannot onboard
 }
 
 //ConfigSet set config for devID

@@ -37,6 +37,8 @@ var confChangerCmd = &cobra.Command{
 			qemuConfigPath = utils.ResolveAbsPath(viper.GetString("eve.config-part"))
 			eveHV = viper.GetString("eve.hv")
 			apiV1 = viper.GetBool("adam.v1")
+
+			zedControl = viper.GetBool("zedcontrol.enabled")
 		}
 		return nil
 	},

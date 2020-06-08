@@ -63,10 +63,16 @@ var setupCmd = &cobra.Command{
 			qemuFileToSave = utils.ResolveAbsPath(viper.GetString("eve.qemu-config"))
 			//eserver
 			eserverImageDist = utils.ResolveAbsPath(viper.GetString("eden.images.dist"))
+
+			zedControl = viper.GetBool("zedcontrol.enabled")
+			zedControlAddress = viper.GetString("zedcontrol.address")
 		}
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
+		if zedControl {
+			certsDomain = "zedcloud.zededa.net"
+		}
 		command, err := os.Executable()
 		if err != nil {
 			log.Fatalf("cannot obtain executable path: %s", err)
@@ -81,7 +87,7 @@ var setupCmd = &cobra.Command{
 			log.Infof("Certs already exists in certs dir: %s", certsDir)
 		}
 		if _, err := os.Stat(filepath.Join(adamDist, "run", "config", "server.pem")); os.IsNotExist(err) {
-			if err := utils.CopyCertsToAdamConfig(certsDir, certsDomain, certsEVEIP, adamPort, adamDist, apiV1); err != nil {
+			if err := utils.CopyCertsToAdamConfig(certsDir, certsDomain, certsEVEIP, adamPort, adamDist, apiV1, zedControl); err != nil {
 				log.Errorf("cannot CopyCertsToAdamConfig: %s", err)
 			} else {
 				log.Info("CopyCertsToAdamConfig done")
