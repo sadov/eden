@@ -195,3 +195,53 @@ func TestLookupBracketsEnds(t *testing.T) {
 		t.Errorf("not %s in %s", ipAddress4, received)
 	}
 }
+
+func TestLookupNoBrackets(t *testing.T) {
+	q := "InfoContent.Niinfo.IpAssignments.IpAddress"
+	temp, err := utils.LookUp(infoTest, q)
+	if err != nil {
+		t.Error(err)
+	}
+	received, ok := temp.Interface().([]string)
+	if !ok {
+		t.Error("not []string")
+	}
+	t.Log(received)
+	if len(received) != 4 {
+		t.Errorf("expected %d values, received %d", 4, len(received))
+	}
+	if !checkInSlice(ipAddress1, received) {
+		t.Errorf("not %s in %s", ipAddress1, received)
+	}
+	if !checkInSlice(ipAddress2, received) {
+		t.Errorf("not %s in %s", ipAddress2, received)
+	}
+	if !checkInSlice(ipAddress3, received) {
+		t.Errorf("not %s in %s", ipAddress3, received)
+	}
+	if !checkInSlice(ipAddress4, received) {
+		t.Errorf("not %s in %s", ipAddress4, received)
+	}
+}
+
+func TestLookupNoBracketsFirst(t *testing.T) {
+	q := "InfoContent.Niinfo.IpAssignments.IpAddress[0]"
+	temp, err := utils.LookUp(infoTest, q)
+	if err != nil {
+		t.Error(err)
+	}
+	received, ok := temp.Interface().([]string)
+	if !ok {
+		t.Error("not []string")
+	}
+	t.Log(received)
+	if len(received) != 2 {
+		t.Errorf("expected %d values, received %d", 2, len(received))
+	}
+	if !checkInSlice(ipAddress1, received) {
+		t.Errorf("not %s in %s", ipAddress1, received)
+	}
+	if !checkInSlice(ipAddress3, received) {
+		t.Errorf("not %s in %s", ipAddress3, received)
+	}
+}
