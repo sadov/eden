@@ -101,6 +101,7 @@ func (cloud *CloudCtx) OnBoardDev(node *device.Ctx) error {
 			node.SetRemoteAddr(cloud.vars.EveRemoteAddr)
 			if !alreadyRegistered { //new node
 				node.SetConfigItem("app.allow.vnc", "true")
+				node.SetConfigItem("debug.enable.usb", "true")
 				log.Debugf("will apply devModel %s", node.GetDevModel())
 				deviceModel, err := cloud.GetDevModelByName(node.GetDevModel())
 				if err != nil {
