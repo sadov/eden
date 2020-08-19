@@ -47,7 +47,8 @@ func (exp *appExpectation) createAppInstanceConfig(img *config.Image, netInstanc
 	for k, ni := range netInstances {
 		acls := []*config.ACE{{
 			Matches: []*config.ACEMatch{{
-				Type: "host",
+				Type:  "ip",
+				Value: "0.0.0.0/0",
 			}},
 			Id: 1,
 		}}

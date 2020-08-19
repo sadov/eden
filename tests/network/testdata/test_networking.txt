@@ -20,6 +20,7 @@
 # create or get two networks for the test
 eden network create 10.1.0.0/24
 eden network create 10.2.0.0/24
+eden network create 10.3.0.0/24
 
 # obtain network list
 eden network ls
@@ -70,7 +71,7 @@ test:
 
 echo "defining of environment variables for the first app"
 
-echo net=$(grep '10.2.0.0/24' network_ls | sed '$s/\(^[^\t]*\).*$/\1/')>.env
+echo net=$(grep '10.1.0.0/24' network_ls | sed '$s/\(^[^\t]*\).*$/\1/'),$(grep '10.2.0.0/24' network_ls | sed '$s/\(^[^\t]*\).*$/\1/')>.env
 echo external_port=''>>.env
 echo metadata={{$test_data}}>>.env
 echo name=app1>>.env
@@ -87,7 +88,7 @@ $EDEN pod ps>pod_ps
 
 echo "defining of environment variables for the second app"
 
-echo net=$(grep '10.1.0.0/24' network_ls | sed '$s/\(^[^\t]*\).*$/\1/'),$(grep '10.2.0.0/24' network_ls | sed '$s/\(^[^\t]*\).*$/\1/')>.env
+echo net=$(grep '10.3.0.0/24' network_ls | sed '$s/\(^[^\t]*\).*$/\1/'),$(grep '10.2.0.0/24' network_ls | sed '$s/\(^[^\t]*\).*$/\1/')>.env
 echo external_port=-p 8027:80>>.env
 echo metadata=http://$(grep '10.2.0.' pod_ps | grep -o -E '10.2.0.[0-9]{1,3}')/user-data.html>>.env
 echo name=app2>>.env
