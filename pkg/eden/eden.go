@@ -73,11 +73,11 @@ func StopRedis(redisRm bool) (err error) {
 		return nil
 	} else {
 		if redisRm {
-			if err := utils.StopContainer(defaults.DefaultRedisContainerName, false); err != nil {
+			if err := utils.StopContainer(defaults.DefaultRedisContainerName, true); err != nil {
 				return fmt.Errorf("error in rm redis container: %s", err)
 			}
 		} else {
-			if err := utils.StopContainer(defaults.DefaultRedisContainerName, true); err != nil {
+			if err := utils.StopContainer(defaults.DefaultRedisContainerName, false); err != nil {
 				return fmt.Errorf("error in rm redis container: %s", err)
 			}
 		}
@@ -231,11 +231,11 @@ func StopRegistry(rm bool) (err error) {
 		return nil
 	} else {
 		if rm {
-			if err := utils.StopContainer(containerName, false); err != nil {
+			if err := utils.StopContainer(containerName, true); err != nil {
 				return fmt.Errorf("error in rm %s container: %s", serviceName, err)
 			}
 		} else {
-			if err := utils.StopContainer(containerName, true); err != nil {
+			if err := utils.StopContainer(containerName, false); err != nil {
 				return fmt.Errorf("error in rm %s container: %s", serviceName, err)
 			}
 		}
@@ -306,11 +306,11 @@ func StopEServer(eserverRm bool) (err error) {
 		return nil
 	} else {
 		if eserverRm {
-			if err := utils.StopContainer(defaults.DefaultEServerContainerName, false); err != nil {
+			if err := utils.StopContainer(defaults.DefaultEServerContainerName, true); err != nil {
 				return fmt.Errorf("error in rm eserver container: %s", err)
 			}
 		} else {
-			if err := utils.StopContainer(defaults.DefaultEServerContainerName, true); err != nil {
+			if err := utils.StopContainer(defaults.DefaultEServerContainerName, false); err != nil {
 				return fmt.Errorf("error in rm eserver container: %s", err)
 			}
 		}
