@@ -15,6 +15,10 @@ source .env
 # deploy the application by nested escript
 test eden.escript.test -test.run TestEdenScripts/deploy_app -test.v  -testdata {{EdenConfig "eden.root"}}/../tests/phoronix/testdata/
 
+message 'waiting for phoronix running state'
+test eden.app.test -test.v -timewait 20m RUNNING phoronix
+eden pod ps
+
 exec -t 180m bash wait_app.sh
 exec cat result
 # expect in stdout
@@ -22,7 +26,11 @@ stdout 'Average'
 stdout 'Deviation'
 
 # teardown applications
-eden pod delete app1
+eden pod delete phoronix
+
+message 'waiting for app removed state'
+test eden.app.test -test.v -timewait 20m - phoronix
+stdout 'no app with phoronix found'
 
 # Test's config file
 -- eden-config.yml --
@@ -35,21 +43,16 @@ test:
         model: {{EdenConfig "eve.devmodel"}}
 
 -- .env --
-name=app1
+name=phoronix
 external_port=-p 8027:80
 
 -- wait_app.sh --
 #!/bin/sh
-
-echo "waiting for app running state"
-
-EDEN={{EdenConfig "eden.root"}}/{{EdenConfig "eden.bin-dist"}}/{{EdenConfig "eden.eden-bin"}}
-until $EDEN pod ps | grep app1 | grep RUNNING; do sleep 5; done
 
 echo "sleep for 60 seconds"
 sleep 60
 
 echo "waiting for the test results"
 
-address=http://$($EDEN pod ps|grep app1|grep -o -E '([0-9]{1,3}[\.]){3}[0-9]{1,3}:8027')
+address=http://$($EDEN pod ps|grep phoronix|grep -o -E '([0-9]{1,3}[\.]){3}[0-9]{1,3}:8027')
 until curl -s $address -o result; do sleep 30; done
