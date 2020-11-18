@@ -316,7 +316,7 @@ var sshEveCmd = &cobra.Command{
 				log.Fatalf("error reading sshKey file %s: %v", ctrl.GetVars().SSHKey, err)
 			}
 			dev.SetConfigItem("debug.enable.ssh", string(b))
-			if err = ctrl.ConfigSync(dev); err != nil {
+			if err = ctrl.ConfigSync(dev, false); err != nil {
 				log.Fatal(err)
 			}
 			if eveRemote || eveRemoteAddr == "" { //obtain IP of EVE from info
@@ -453,7 +453,7 @@ var resetEveCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		if err = ctrl.StateUpdate(dev); err != nil {
+		if err = ctrl.ConfigSync(dev, true); err != nil {
 			log.Fatal(err)
 		}
 		log.Info("reset done")

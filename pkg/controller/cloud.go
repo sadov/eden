@@ -57,7 +57,7 @@ type Cloud interface {
 	ListVolume() []*config.Volume
 	GetConfigBytes(dev *device.Ctx, pretty bool) ([]byte, error)
 	GetDeviceCurrent() (dev *device.Ctx, err error)
-	ConfigSync(dev *device.Ctx) (err error)
+	ConfigSync(dev *device.Ctx, force bool) (err error)
 	ConfigParse(config *config.EdgeDevConfig) (dev *device.Ctx, err error)
 	GetNetworkConfig(id string) (networkConfig *config.NetworkConfig, err error)
 	AddNetworkConfig(networkInstanceConfig *config.NetworkConfig) error

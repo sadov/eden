@@ -200,7 +200,7 @@ func (tc *TestContext) ConfigSync(edgeNode *device.Ctx) {
 	} else {
 		log.Debugf("Device %s onboarded", edgeNode.GetID().String())
 	}
-	if err := tc.GetController().ConfigSync(edgeNode); err != nil {
+	if err := tc.GetController().ConfigSync(edgeNode, false); err != nil {
 		log.Fatalf("Cannot send config of %s", edgeNode.GetName())
 	}
 }

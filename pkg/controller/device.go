@@ -202,16 +202,20 @@ func (cloud *CloudCtx) ConfigParse(config *config.EdgeDevConfig) (device *device
 }
 
 //ConfigSync set config for devID
-func (cloud *CloudCtx) ConfigSync(dev *device.Ctx) (err error) {
+//if force increment version regardless of hash change
+func (cloud *CloudCtx) ConfigSync(dev *device.Ctx, force bool) (err error) {
 	devConfig, err := cloud.GetConfigBytes(dev, false)
 	if err != nil {
 		return err
 	}
 	hash := sha256.Sum256(devConfig)
-	if dev.CheckHash(hash) {
+	if dev.CheckHash(hash) || force {
 		fmt.Println(string(devConfig)) //print config only if changed
 		if devConfig, err = VersionIncrement(devConfig); err != nil {
 			return fmt.Errorf("VersionIncrement error: %s", err)
+		}
+		if force {
+			dev.CheckHash(hash)
 		}
 		if err = cloud.ConfigSet(dev.GetID(), devConfig); err != nil {
 			return err

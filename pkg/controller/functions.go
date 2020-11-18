@@ -135,7 +135,7 @@ func (cloud *CloudCtx) OnBoardDev(node *device.Ctx) error {
 				if err = cloud.ApplyDevModel(node, deviceModel); err != nil {
 					return fmt.Errorf("fail in ApplyDevModel: %s", err)
 				}
-				if err = cloud.ConfigSync(node); err != nil {
+				if err = cloud.ConfigSync(node, false); err != nil {
 					log.Fatal(err)
 				}
 			}

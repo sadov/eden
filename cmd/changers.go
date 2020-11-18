@@ -112,7 +112,7 @@ func (ctx *adamChanger) getControllerAndDev() (controller.Cloud, *device.Ctx, er
 }
 
 func (ctx *adamChanger) setControllerAndDev(ctrl controller.Cloud, dev *device.Ctx) error {
-	if err := ctrl.ConfigSync(dev); err != nil {
+	if err := ctrl.ConfigSync(dev, false); err != nil {
 		return fmt.Errorf("configSync error: %s", err)
 	}
 	return nil
