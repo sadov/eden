@@ -30,6 +30,9 @@ then
   $EDEN config set "$CFG" --key eve.hostfwd --value "$NEW"
   echo $EDEN config get "$CFG" --key eve.hostfwd
   $EDEN config get "$CFG" --key eve.hostfwd
+  echo $EDEN eve ssh 'poweroff -f'
+  $EDEN eve ssh 'poweroff -f'
+  sleep 5
   echo $EDEN eve stop
   $EDEN eve stop
   sleep 5
