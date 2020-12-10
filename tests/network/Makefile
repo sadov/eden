@@ -1,4 +1,5 @@
 DEBUG ?= "debug"
+DO_TEMPLATE ?= 1
 
 # HOSTARCH is the host architecture
 # ARCH is the target architecture
@@ -50,7 +51,7 @@ build: setup
 
 setup:
 	cp $(TESTSCN) $(WORKDIR)
-	$(LOCALBIN) utils template eden-config.tmpl>eden-config.yml
+	@if [ $(DO_TEMPLATE) -ne 0 ]; then $(LOCALBIN) utils template eden-config.tmpl>eden-config.yml; fi
 
 .PHONY: test build setup clean all image
 

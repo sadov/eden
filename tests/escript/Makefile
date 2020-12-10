@@ -1,4 +1,5 @@
 DEBUG ?= "debug"
+DO_TEMPLATE ?= 1
 
 # HOSTARCH is the host architecture
 # ARCH is the target architecture
@@ -49,12 +50,12 @@ testbin: $(TESTBIN)
 $(LOCALTESTBIN): $(BINDIR) *.go
 	CGO_ENABLED=0 GOOS=$(OS) GOARCH=$(ARCH) go test -c -o $@ *.go
 $(TESTBIN): $(LOCALTESTBIN)
-	@if [ "$(OS)" = "$(HOSTOS)" -a "$(ARCH)" = "$(HOSTARCH)" ]; then cp $(LOCALTESTBIN) $(CURDIR)/$(TESTBIN); fi
+	@if [ "$(OS)" = "$(HOSTOS)" -a "$(ARCH)" = "$(HOSTARCH)" ]; then  ln -sf $(LOCALTESTBIN) $(CURDIR)/$(TESTBIN); fi
 
 setup: testbin
 	cp custom.fail.scenario.txt failScenario.txt $(TESTSCN) $(WORKDIR)
-	@if [ "$(OS)" = "$(HOSTOS)" -a "$(ARCH)" = "$(HOSTARCH)" ]; then cp $(LINKDIR)/$(TESTBIN) $(BINDIR)/; fi
-	$(LOCALBIN) utils template eden-config.tmpl>eden-config.yml
+	@if [ "$(OS)" = "$(HOSTOS)" -a "$(ARCH)" = "$(HOSTARCH)" ]; then  ln -sf $(LINKDIR)/$(TESTBIN) $(BINDIR)/; fi
+	@if [ $(DO_TEMPLATE) -ne 0 ]; then $(LOCALBIN) utils template eden-config.tmpl>eden-config.yml; fi
 
 .PHONY: test build setup clean all testbin
 
