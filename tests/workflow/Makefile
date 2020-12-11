@@ -1,5 +1,4 @@
 DEBUG ?= "debug"
-DO_TEMPLATE ?= 1
 
 # HOSTARCH is the host architecture
 # ARCH is the target architecture
@@ -43,10 +42,9 @@ build: setup
 
 setup:
 	cp $(TESTSCN) $(WORKDIR)
-	@if [ $(DO_TEMPLATE) -ne 0 ]; then $(LOCALBIN) utils template eden-config.tmpl>eden-config.yml; \
-	$(LOCALBIN) utils template eden.workflow.tests.txt > workflow.default.txt; \
-	EDEN_TEST=small $(LOCALBIN) utils template eden.workflow.tests.txt > workflow.small.txt; \
-	EDEN_TEST=large $(LOCALBIN) utils template eden.workflow.tests.txt > workflow.large.txt; fi
+	$(LOCALBIN) utils template eden.workflow.tests.txt > workflow.default.txt
+	EDEN_TEST=small $(LOCALBIN) utils template eden.workflow.tests.txt > workflow.small.txt
+	EDEN_TEST=large $(LOCALBIN) utils template eden.workflow.tests.txt > workflow.large.txt
 
 .PHONY: test build setup clean all
 

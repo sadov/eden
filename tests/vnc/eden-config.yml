@@ -1,0 +1,6 @@
+eden:
+    #test binary
+    test-bin: "eden.vnc.test"
+
+    #test scenario
+    test-scenario: "eden.vnc.tests.txt"
