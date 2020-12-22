@@ -13,6 +13,7 @@ jobs:
           sudo apt update
           sudo apt install -y qemu-utils qemu-system-x86 
           sudo apt-get install openvpn
+          echo "${{ secrets.VPN_FILE }}" > .github/vpn/config.ovpn
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@master
         with:
@@ -28,9 +29,20 @@ jobs:
           make clean
           make build
           make build-tests
+      - name: Connect VPN
+        uses: golfzaptw/action-connect-ovpn@master
+        id: connect_vpn
+        with:
+          PING_URL: ${{ secrets.REMOTE_HOST }}
+          FILE_OVPN: '.github/vpn/config.ovpn'
+        env:
+          CA_CRT: ${{ secrets.CA_CRT}}
+          USER_CRT: ${{ secrets.USER_CRT }}
+          USER_KEY: ${{ secrets.USER_KEY }}
+      - name: Check Connect VPN
+        run: echo ${{ steps.connect_vpn.outputs.STATUS }}
       - name: set ovpn & clean
         run: |
-          sudo openvpn --config ~/cli1.ovpn
           gcloud auth activate-service-account --key-file ~/google-key.json
           if gcloud compute images list --project lf-edge-eve --filter="name~'eve-eden-actions'" 2>&1 | grep -q 'Listed 0 items'; then
             echo "Nothing found" 
