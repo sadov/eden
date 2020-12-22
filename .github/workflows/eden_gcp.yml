@@ -11,7 +11,7 @@ jobs:
       - name: setup
         run: |
           sudo apt update
-          sudo apt install -y qemu-utils qemu-system-x86 gcloud
+          sudo apt install -y qemu-utils qemu-system-x86 
           echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
           sudo apt-get install apt-transport-https ca-certificates gnupg
           echo "deb https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
