@@ -1,0 +1,63 @@
+---
+name: EdenGCP
+on:  # yamllint disable-line rule:truthy
+  pull_request:
+    branches: [master]
+
+jobs:
+  integration:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: setup
+        run: |
+          sudo apt update
+          sudo apt install -y qemu-utils qemu-system-x86 gcloud
+          echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+          sudo apt-get install apt-transport-https ca-certificates gnupg
+          echo "deb https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+          curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+          curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+          sudo apt-get update && sudo apt-get install google-cloud-sdk
+          gcloud init
+          sudo apt-get install openvpn
+      - name: get eden
+        uses: actions/checkout@v2
+      - name: build eden
+        run: |
+          make clean
+          make build
+          make build-tests
+      - name: set ovpn & clean
+        run: |
+          sudo openvpn --config ~/cli1.ovpn
+          gcloud auth activate-service-account --key-file ~/google-key.json
+          if gcloud compute images list --project lf-edge-eve --filter="name~'eve-eden-actions'" 2>&1 | grep -q 'Listed 0 items'; then
+            echo "Nothing found" 
+          else
+            gcloud compute instances delete eve-eden-actions -q --zone=us-west1-a	
+            gcloud compute images delete eve-eden-actions -q
+          fi
+      - name: GCP set
+        run: |
+          ./eden config add default --devmodel GCP 
+          ./eden config set default --key adam.eve-ip --value 35.227.137.74
+          ./eden setup
+          ./eden utils gcp image --image-name eve-eden-one -k ../google.json   upload /home/jenkins/workspace/eve-docker-image/eden/dist/images/eve/live.img
+          ./eden utils gcp vm --image-name eve-eden-one --vm-name eve-eden-one -k ../google.json run
+          ./eden start
+          BWD=$(./eden utils gcp vm get-ip --vm-name eve-eden-one -k ./../google.json)
+          echo "the IP is $BWD"
+          ./eden utils gcp firewall -k ./../google.json  --source-range $BWD --name edenlarge$BUILD_NUMBER 
+          ./eden eve onboard
+          EDEN_TEST=large ./eden test tests/workflow -v debug 
+      - name: Collect logs
+        if: ${{ always() }}
+        run: |
+          ./eden log --format json > trace.log
+          ./eden stop
+      - name: Store raw test results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: 'eden-report'
+          path: ${{ github.workspace }}/trace.log
