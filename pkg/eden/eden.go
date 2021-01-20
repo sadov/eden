@@ -525,6 +525,11 @@ func GenerateEVEConfig(eveConfig string, domain string, ip string, port int, api
 			return fmt.Errorf("GenerateEVEConfig: %s", err)
 		}
 	}
+	if _, err = os.Stat(filepath.Join(eveConfig, "grub.cfg")); os.IsNotExist(err) {
+		if err = ioutil.WriteFile(filepath.Join(eveConfig, "grub.cfg"), []byte("set_kvm_boot\n"), 0666); err != nil {
+			return fmt.Errorf("GenerateEVEConfig: %s", err)
+		}
+	}
 	return nil
 }
 
