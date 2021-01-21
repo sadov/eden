@@ -21,6 +21,13 @@ PROCESSING_VERSION ?= "1.2"
 # PROCESSING_DIR is the directory with processing Dockerfile to build
 PROCESSING_DIR=$(CURDIR)/processing
 
+# TFTP_TAG is the tag for tftp image to build
+TFTP_TAG ?= "itmoeve/eden-tftp"
+# TFTP_VERSION is the version of tftp image to build
+TFTP_VERSION ?= "1.0"
+# TFTP_DIR is the directory with tftp Dockerfile to build
+TFTP_DIR=$(CURDIR)/tftp
+
 # HOSTARCH is the host architecture
 # ARCH is the target architecture
 # we need to keep track of them separately
@@ -114,7 +121,7 @@ stop: build
 dist: build-tests
 	tar cvzf dist/eden_dist.tgz dist/bin dist/scripts dist/tests dist/*.txt
 
-.PHONY: processing eserver all clean test build build-tests config setup stop testbin gotestsum dist
+.PHONY: tftp processing eserver all clean test build build-tests config setup stop testbin gotestsum dist
 
 eserver:
 	@echo "Build eserver image"
@@ -123,6 +130,10 @@ eserver:
 processing:
 	@echo "Build processing image"
 	@if [ $(DO_DOCKER) -ne 0 ]; then docker build -t $(PROCESSING_TAG):$(PROCESSING_VERSION) $(PROCESSING_DIR); fi
+
+tftp:
+	@echo "Build tftp image"
+	@if [ $(DO_DOCKER) -ne 0 ]; then docker build -t $(TFTP_TAG):$(TFTP_VERSION) $(TFTP_DIR); fi
 
 yetus:
 	@echo Running yetus
