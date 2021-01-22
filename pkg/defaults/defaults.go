@@ -48,16 +48,18 @@ const (
 	DefaultRegistryPort = 5000
 
 	//tags, versions, repos
-	DefaultEVETag               = "0.0.0-master-6aaa87a0" //DefaultEVETag tag for EVE image
+	DefaultEVETag               = "0.0.0-master-03581467" //DefaultEVETag tag for EVE image
 	DefaultAdamTag              = "cf3e117efbe5f32846a6a84385ea429c65679f14"
 	DefaultRedisTag             = "6"
 	DefaultRegistryTag          = "2.7"
 	DefaultProcTag              = "1.2"
+	DefaultTFTPTag              = "1.0"
 	DefaultImage                = "library/alpine"
 	DefaultAdamContainerRef     = "lfedge/adam"
 	DefaultRedisContainerRef    = "redis"
 	DefaultRegistryContainerRef = "library/registry"
 	DefaultProcContainerRef     = "itmoeve/eden-processing"
+	DefaultTFTPContainerRef     = "itmoeve/eden-tftp"
 	DefaultEveRepo              = "https://github.com/lf-edge/eve.git"
 	DefaultEveRegistry          = "lfedge"
 	DefaultRegistry             = "docker.io"
