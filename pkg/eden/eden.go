@@ -349,7 +349,7 @@ func StartEVEVBox(vmName string, cpus int, mem int, hostFwd map[string]string) (
 		if err = utils.RunCommandWithLogAndWait("VBoxManage", defaults.DefaultLogLevelToPrint, strings.Fields(commandArgsString)...); err != nil {
 			log.Fatalf("VBoxManage error for command %s %s", commandArgsString, err)
 		}
-		commandArgsString = fmt.Sprintf("modifyvm %s --cpus %d --memory %d --vram 16 --nested-hw-virt on --ostype Ubuntu_64  --mouse usbtablet --graphicscontroller vmsvga --boot1 disk --boot2 net", vmName, cpus, mem)
+		commandArgsString = fmt.Sprintf("modifyvm %s --firmware efi --rtcuseutc on --cpus %d --memory %d --vram 16 --nested-hw-virt on --ostype Ubuntu_64  --mouse usbtablet --graphicscontroller vmsvga --boot1 disk --boot2 net", vmName, cpus, mem)
 		if err = utils.RunCommandWithLogAndWait("VBoxManage", defaults.DefaultLogLevelToPrint, strings.Fields(commandArgsString)...); err != nil {
 			log.Fatalf("VBoxManage error for command %s %s", commandArgsString, err)
 		}
