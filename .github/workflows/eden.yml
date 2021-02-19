@@ -26,12 +26,18 @@ jobs:
           ./eden config add default
           ./eden config set default --key=eve.accel --value=false
           echo > tests/workflow/testdata/eden_stop.txt
-          ./eden test ./tests/workflow -v debug
+          #./eden test ./tests/workflow -v debug
+          make test
       - name: Collect logs
         if: ${{ always() }}
         run: |
           ./eden log --format json > trace.log
           ./eden stop
+      - name: Report test results as Annotations
+        if: ${{ always() }}
+        uses: guyarb/golang-test-annotations@v0.1
+        with:
+          test-results: dist/results.json
       - name: Store raw test results
         if: ${{ always() }}
         uses: actions/upload-artifact@v2

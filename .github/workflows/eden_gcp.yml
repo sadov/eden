@@ -67,7 +67,8 @@ jobs:
           echo > tests/workflow/testdata/eden_stop.txt
       - name: Test
         run: |
-          EDEN_TEST=gcp ./eden test tests/workflow -v debug
+          #EDEN_TEST=gcp ./eden test tests/workflow -v debug
+          EDEN_TEST=gcp make test
       - name: Collect logs
         if: ${{ always() }}
         run: |
@@ -80,6 +81,11 @@ jobs:
           gcloud compute firewall-rules delete eden-actions-${{ matrix.hv }}-${{github.run_number}} || echo "not exists"
           gcloud compute instances delete eve-eden-actions-${{ matrix.hv }}-${{github.run_number}} -q --zone=us-west1-a || echo "not exists"
           gcloud compute images delete eve-eden-actions-${{ matrix.hv }}-${{github.run_number}} -q || echo "not exists"
+      - name: Report test results as Annotations
+        if: ${{ always() }}
+        uses: guyarb/golang-test-annotations@v0.1
+        with:
+          test-results: dist/results.json
       - name: Store raw test results
         if: ${{ always() }}
         uses: actions/upload-artifact@v2
